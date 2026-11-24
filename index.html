@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChipWorld – Thế giới vi mạch</title>
+<style>
+html{scroll-behavior:smooth}
+
+:root{--navy:#071426;--n2:#0d2542;--cyan:#00B8FF;--white:#F8FAFC;--mut:#9fb8d1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Segoe UI',sans-serif;background:var(--navy);color:var(--white);line-height:1.6}
+section{padding:50px 5%;scroll-margin-top:10px}h2{text-align:center;color:var(--cyan);margin-bottom:20px;font-size:1.8rem}
+.hero{min-height:60vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:radial-gradient(circle at 70% 30%,#12386b,var(--navy) 65%)}
+.hero h1{font-size:clamp(2rem,6vw,4rem);color:var(--cyan);text-shadow:0 0 24px rgba(0,184,255,.6)}.hero p{max-width:620px;color:var(--mut);margin:10px 0}
+.btn{border:1px solid var(--cyan);background:var(--cyan);color:var(--navy);padding:9px 20px;border-radius:99px;font:700 .9rem inherit;font-family:inherit;cursor:pointer;margin:4px}.btn.g{background:transparent;color:var(--white)}.btn.s{padding:6px 14px;font-size:.8rem}
+.bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px}
+.bar input,.bar select,.adv select{padding:8px 12px;border-radius:10px;border:0;font:inherit;background:var(--white);color:var(--navy)}
+.chipbtn{border:1px solid var(--cyan);background:transparent;color:var(--white);padding:5px 14px;border-radius:99px;cursor:pointer}.chipbtn.on{background:var(--cyan);color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;max-width:1150px;margin:auto}
+.card{background:rgba(255,255,255,.06);backdrop-filter:blur(6px);border:1px solid rgba(0,184,255,.3);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:6px;transition:.3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 0 22px rgba(0,184,255,.35)}
+.tag{background:var(--n2);color:var(--cyan);font-size:.72rem;padding:2px 10px;border-radius:99px;width:fit-content}
+.price{color:var(--cyan);font-weight:700;font-size:1.1rem}.mut{color:var(--mut);font-size:.85rem}.ok{color:#4ade80}.no{color:#f87171}
+.acts{margin-top:auto;display:flex;gap:6px;flex-wrap:wrap}
+.box{background:rgba(255,255,255,.06);border:1px solid rgba(0,184,255,.3);border-radius:16px;padding:20px;max-width:900px;margin:12px auto}
+.box h3{color:var(--cyan);margin-bottom:6px}.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;max-width:1000px;margin:auto}
+.two .box{margin:0}
+dialog,#cart{background:#0b1d36;color:var(--white);border:1px solid var(--cyan);border-radius:16px;padding:22px}dialog{max-width:520px;width:92%;margin:auto}dialog::backdrop{background:rgba(0,0,0,.7)}
+#cart{position:fixed;right:0;top:0;bottom:0;width:min(380px,100%);border-radius:16px 0 0 16px;transform:translateX(105%);transition:.3s;overflow:auto;z-index:50}#cart.open{transform:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:.9rem}
+.qty button{width:26px;height:26px;border-radius:50%;border:1px solid var(--cyan);background:none;color:var(--white);cursor:pointer}
+.adv{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:14px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--cyan);color:var(--navy);padding:8px 20px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:99}#toast.show{opacity:1}
+table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+/* ===== Header ===== */
+:root{--navy:#071426;--cyan:#00B8FF;--white:#F8FAFC}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Segoe UI',sans-serif;background:var(--navy);color:var(--white)}
+#hdr header{display:flex;align-items:center;gap:16px;padding:10px 4%;background:linear-gradient(90deg,#071426,#0b2548);border-bottom:1px solid rgba(0,184,255,.4);flex-wrap:wrap}
+#hdr .logo{display:flex;align-items:center;gap:8px;color:var(--cyan);text-decoration:none;font-weight:700;font-size:1.25rem}
+#hdr .logo svg{width:34px;filter:drop-shadow(0 0 6px var(--cyan))}
+#hdr .logo small{display:block;font-size:.65rem;color:#9fc7e6;font-weight:400}
+#hdr nav{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap}
+#hdr nav a{color:var(--white);text-decoration:none;padding:6px 12px;border-radius:99px;font-size:.88rem;transition:.25s}
+#hdr nav a:hover{background:var(--cyan);color:var(--navy);box-shadow:0 0 12px var(--cyan)}
+#hdr .tools{display:flex;gap:8px;align-items:center}
+#hdr input{padding:7px 14px;border-radius:99px;border:0;width:180px;font:inherit;font-size:.85rem}
+#hdr .btn{border:1px solid var(--cyan);background:transparent;color:var(--white);padding:7px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:.85rem;text-decoration:none}
+#hdr .btn:hover{background:var(--cyan);color:var(--navy)}
+#hdr #badge{background:var(--cyan);color:var(--navy);border-radius:99px;padding:0 7px;font-weight:700;margin-left:4px}
+@media(max-width:760px){#hdr nav{order:3;flex-basis:100%}}#hdr{position:sticky;top:0;z-index:40}
+/* ===== Footer ===== */
+:root{--navy:#071426;--cyan:#00B8FF;--white:#F8FAFC}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,'Segoe UI',sans-serif;background:var(--navy);color:#b9d3ea;line-height:1.6}
+#ftr footer{padding:36px 5% 18px;border-top:1px solid rgba(0,184,255,.4);background:linear-gradient(180deg,#071426,#050d1a)}
+#ftr .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:1100px;margin:auto}
+#ftr h4{color:var(--cyan);margin-bottom:8px}
+#ftr a{color:#b9d3ea;text-decoration:none;display:block;padding:2px 0}
+#ftr a:hover{color:var(--cyan)}
+#ftr form{display:flex;gap:6px;margin-top:6px}
+#ftr input{flex:1;min-width:0;padding:7px 12px;border-radius:99px;border:0;font:inherit}
+#ftr button{border:0;border-radius:99px;padding:7px 14px;background:var(--cyan);color:var(--navy);font-weight:700;cursor:pointer}
+#ftr #msg{font-size:.85rem;color:var(--cyan);min-height:1.2em;margin-top:4px}
+#ftr .copy{text-align:center;font-size:.8rem;margin-top:22px;color:#7f9bb8}
+</style></head><body>
+
+<header id="hdr">
+  <a class="logo" href="#" data-go="home"><svg viewBox="0 0 40 40"><rect x="10" y="10" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><rect x="16" y="16" width="8" height="8" fill="currentColor"/><path d="M15 4v6M25 4v6M15 30v6M25 30v6M4 15h6M4 25h6M30 15h6M30 25h6" stroke="currentColor" stroke-width="2.5"/></svg><span>ChipWorld<small>Thế giới vi mạch</small></span></a>
+  <nav>
+    <a href="#" data-go="home">Trang chủ</a><a href="#" data-go="store">Cửa hàng</a><a href="#" data-go="advisor">Tư vấn chọn chip</a><a href="#" data-go="knowledge">Kiến thức chip</a>
+  </nav>
+  <form class="tools" id="sf"><input id="hq" type="search" placeholder="Tìm chip..." aria-label="Tìm kiếm">
+    <a class="btn" href="#" data-go="cart">🛒 Giỏ hàng<span id="badge">0</span></a></form>
+</header>
+
+
+<section class="hero" id="home"><h1>EXPLORE THE WORLD OF MICROCHIPS</h1>
+<p>Hiểu công nghệ – Chọn đúng chip – Mua sắm thông minh</p>
+<div><button class="btn" onclick="jump('store')">Khám phá sản phẩm</button><button class="btn g" onclick="jump('knowledge')">Tìm hiểu về chip</button></div></section>
+
+<section id="store"><h2>Cửa hàng chip</h2>
+<div class="bar"><input id="q" type="search" placeholder="Tìm chip, hãng..." aria-label="Tìm"><select id="sort" aria-label="Sắp xếp"><option value="">Sắp xếp</option><option value="asc">Giá tăng dần</option><option value="desc">Giá giảm dần</option></select>
+<select id="maxp" aria-label="Mức giá"><option value="0">Mọi mức giá</option><option value="500000">Dưới 500.000đ</option><option value="3000000">Dưới 3.000.000đ</option><option value="10000000">Dưới 10.000.000đ</option></select></div>
+<div class="bar" id="cats"></div><div class="grid" id="grid"></div>
+<p class="mut" style="text-align:center;margin-top:12px">Giá, tình trạng hàng và đánh giá là <b>dữ liệu minh họa</b>. Thông số lấy từ công bố của nhà sản xuất.</p></section>
+
+<section id="advisor"><h2>Tư vấn chọn chip</h2>
+<div class="adv"><select id="aPurpose" aria-label="Mục đích"><option value="office">Học tập, văn phòng</option><option value="game">Chơi game</option><option value="ai">Chạy mô hình AI / đồ họa</option><option value="iot">Thiết bị nhúng, IoT</option></select>
+<select id="aBudget" aria-label="Ngân sách"><option value="500000">Dưới 500.000đ</option><option value="3000000">Dưới 3.000.000đ</option><option value="10000000" selected>Dưới 10.000.000đ</option><option value="99999999">Không giới hạn</option></select>
+<button class="btn" id="aGo">Gợi ý cho tôi</button></div><div class="grid" id="aOut"></div></section>
+
+<section id="knowledge"><h2>Kiến thức chip</h2><div class="two">
+<div class="box"><h3>Chip là gì?</h3><p>Chip (mạch tích hợp – IC) là mảnh bán dẫn, thường bằng silic, chứa rất nhiều transistor nối với nhau để xử lý hoặc lưu trữ thông tin.</p></div>
+<div class="box"><h3>CPU, GPU, NPU, MCU</h3><p><b>CPU</b>: xử lý đa dụng. <b>GPU</b>: xử lý song song, đồ họa và AI. <b>NPU</b>: tăng tốc tác vụ AI. <b>MCU</b>: vi điều khiển nhỏ gọn cho thiết bị nhúng.</p></div>
+<div class="box"><h3>Ai làm gì?</h3><p><b>Fabless</b> chỉ thiết kế (NVIDIA, AMD, Qualcomm). <b>Foundry</b> chỉ gia công (TSMC). <b>IDM</b> thiết kế và sản xuất (Intel, Samsung). Máy quang khắc EUV do ASML cung cấp.</p></div>
+<div class="box"><h3>Bạn cần biết trước khi mua</h3><p>Số nhân/luồng, xung nhịp, TDP, socket và tiến trình đều quan trọng, nhưng không thông số nào đủ để kết luận chip mạnh hơn. Hãy kiểm tra socket tương thích với bo mạch của bạn.</p></div></div></section>
+
+<aside id="cart" aria-label="Giỏ hàng"></aside><dialog id="dlg"></dialog><div id="toast" role="status"></div>
+
+
+<footer id="ftr">
+  <div class="cols">
+    <div><h4>ChipWorld</h4><p>Hiểu công nghệ – Chọn đúng chip – Mua sắm thông minh. Nền tảng kiến thức và mua sắm vi mạch bán dẫn.</p></div>
+    <div><h4>Liên kết</h4><a href="#store">Cửa hàng</a><a href="#advisor">Tư vấn chọn chip</a><a href="#knowledge">Kiến thức chip</a></div>
+    <div><h4>Liên hệ</h4><p>Email: lienhe@chipworld.example<br>Hotline: 0000 000 000<br><small>(thông tin minh họa – thay bằng thông tin thật)</small></p></div>
+    <div><h4>Nhận tin công nghệ</h4><form id="f"><input id="em" type="email" placeholder="Email của bạn" required aria-label="Email"><button>Đăng ký</button></form><div id="msg" role="status"></div></div>
+  </div>
+  <p class="copy">© 2026 ChipWorld – Thế giới vi mạch. Giá và tình trạng hàng trên website là dữ liệu minh họa.</p>
+</footer>
+
+<script>
+
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vnd=n=>n.toLocaleString('vi-VN')+'đ';
+/* DỮ LIỆU: thông số theo công bố NSX; giá/tồn kho/đánh giá là minh họa. Thay bằng API/Firebase khi triển khai. */
+const P=[
+{id:'i5-12400f',name:'Intel Core i5-12400F',brand:'Intel',cat:'CPU máy tính',price:3200000,stock:true,rate:4.6,use:['office','game'],spec:{'Nhân/luồng':'6/12','Xung tối đa':'4,4 GHz','Công suất cơ bản':'65 W','Socket':'LGA1700','Tiến trình':'Intel 7'},pros:'Giá hợp lý, đủ cho văn phòng và game phổ thông.',cons:'Không có đồ họa tích hợp (hậu tố F).'},
+{id:'r5-5600x',name:'AMD Ryzen 5 5600X',brand:'AMD',cat:'CPU máy tính',price:3600000,stock:true,rate:4.7,use:['office','game'],spec:{'Nhân/luồng':'6/12','Xung tối đa':'4,6 GHz','TDP':'65 W','Socket':'AM4','Tiến trình':'TSMC 7nm (CPU die)'},pros:'Hiệu năng/giá tốt, nền tảng AM4 phổ biến.',cons:'Không có đồ họa tích hợp; nền tảng đời cũ.'},
+{id:'r7-7700x',name:'AMD Ryzen 7 7700X',brand:'AMD',cat:'CPU máy tính',price:8500000,stock:false,rate:4.7,use:['game','ai'],spec:{'Nhân/luồng':'8/16','Xung tối đa':'5,4 GHz','TDP':'105 W','Socket':'AM5','Tiến trình':'TSMC 5nm (CPU die)'},pros:'Nền tảng AM5 mới, hỗ trợ DDR5.',cons:'Cần bo mạch và RAM DDR5; TDP cao hơn.'},
+{id:'rtx4060',name:'NVIDIA GeForce RTX 4060',brand:'NVIDIA',cat:'GPU',price:8900000,stock:true,rate:4.5,use:['game','ai'],spec:{'CUDA core':'3072','Bộ nhớ':'8 GB GDDR6','Công suất card':'115 W','Kiến trúc':'Ada Lovelace','Tiến trình':'TSMC 4N'},pros:'Tiết kiệm điện, hỗ trợ DLSS 3.',cons:'8 GB VRAM có thể hạn chế với tác vụ nặng.'},
+{id:'rp2040',name:'Raspberry Pi RP2040',brand:'Raspberry Pi',cat:'Vi điều khiển',price:60000,stock:true,rate:4.8,use:['iot'],spec:{'Lõi':'2 × Arm Cortex-M0+','Xung':'tối đa 133 MHz','SRAM':'264 KB','GPIO':'30'},pros:'Rẻ, tài liệu tốt, có PIO linh hoạt.',cons:'Không có Wi-Fi tích hợp trên chip.'},
+{id:'esp32',name:'Espressif ESP32',brand:'Espressif',cat:'Chip IoT',price:150000,stock:true,rate:4.6,use:['iot'],spec:{'Lõi':'2 × Xtensa LX6','Xung':'tối đa 240 MHz','Kết nối':'Wi-Fi + Bluetooth','SRAM':'520 KB'},pros:'Tích hợp Wi-Fi/Bluetooth, giá rẻ.',cons:'Tiêu thụ điện cao hơn MCU thuần khi bật Wi-Fi.'},
+{id:'stm32f103',name:'STMicro STM32F103C8',brand:'STMicroelectronics',cat:'Vi điều khiển',price:90000,stock:true,rate:4.4,use:['iot'],spec:{'Lõi':'Arm Cortex-M3','Xung':'72 MHz','Flash':'64 KB','SRAM':'20 KB'},pros:'Phổ biến, nhiều ví dụ tham khảo.',cons:'Tài nguyên khiêm tốn so với dòng mới.'}];
+const store={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+let cart=store.get('cw_cart',[]),cat='Tất cả',coupon=0,toastT;
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),1800)};
+const jump=id=>$('#'+id).scrollIntoView({behavior:'smooth'});
+const card=p=>`<article class="card"><span class="tag">${esc(p.cat)}</span><h3>${esc(p.name)}</h3><span class="mut">${esc(p.brand)} · ⭐ ${p.rate}</span>
+<span class="price">${vnd(p.price)}</span><span class="${p.stock?'ok':'no'}">${p.stock?'Còn hàng':'Hết hàng'}</span>
+<div class="acts"><button class="btn s g" data-d="${p.id}">Chi tiết</button><button class="btn s" data-a="${p.id}" ${p.stock?'':'disabled'}>Thêm vào giỏ</button></div></article>`;
+function render(){const q=$('#q').value.trim().toLowerCase(),mx=+$('#maxp').value,so=$('#sort').value;
+  let l=P.filter(p=>(cat==='Tất cả'||p.cat===cat)&&(!mx||p.price<=mx)&&(!q||(p.name+p.brand+p.cat).toLowerCase().includes(q)));
+  if(so)l.sort((a,b)=>so==='asc'?a.price-b.price:b.price-a.price);
+  $('#grid').innerHTML=l.map(card).join('')||'<p class="mut">Không có sản phẩm phù hợp.</p>';
+  $('#cats').innerHTML=['Tất cả',...new Set(P.map(p=>p.cat))].map(c=>`<button class="chipbtn ${c===cat?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('')}
+function renderCart(){const tot=cart.reduce((s,i)=>s+i.n*P.find(p=>p.id===i.id).price,0),dis=Math.round(tot*coupon);
+  $('#cart').innerHTML=`<h3>Giỏ hàng <button class="btn s g" data-x>Đóng</button></h3>`+(cart.map(i=>{const p=P.find(x=>x.id===i.id);return `<div class="row"><span>${esc(p.name)}<br><small>${vnd(p.price)}</small></span><span class="qty"><button data-m="${i.id}" aria-label="Giảm">−</button> ${i.n} <button data-p="${i.id}" aria-label="Tăng">+</button> <button data-r="${i.id}" aria-label="Xóa">🗑</button></span></div>`}).join('')||'<p class="mut">Giỏ hàng trống.</p>')+
+  (cart.length?`<div class="row"><input id="cp" placeholder="Mã giảm giá (thử CHIP10)" style="flex:1;padding:6px;border-radius:8px;border:0"><button class="btn s" data-cp>Áp dụng</button></div>
+  <div class="row"><span>Giảm giá</span><b>-${vnd(dis)}</b></div><div class="row"><span>Tổng</span><b class="price">${vnd(tot-dis)}</b></div>
+  <form id="co"><input name="n" placeholder="Họ tên" required minlength="2" style="width:100%;margin:6px 0;padding:7px;border-radius:8px;border:0"><input name="a" placeholder="Địa chỉ giao hàng" required minlength="6" style="width:100%;margin-bottom:6px;padding:7px;border-radius:8px;border:0"><input name="t" placeholder="Số điện thoại" required pattern="0[0-9]{9}" title="10 số, bắt đầu bằng 0" style="width:100%;margin-bottom:6px;padding:7px;border-radius:8px;border:0"><button class="btn" style="width:100%">Đặt hàng</button></form>`:'');
+  store.set('cw_cart',cart)}
+const openCart=()=>{renderCart();$('#cart').classList.add('open')};
+function detail(id){const p=P.find(x=>x.id===id);
+  $('#dlg').innerHTML=`<span class="tag">${esc(p.cat)}</span><h3>${esc(p.name)}</h3><p class="mut">${esc(p.brand)}</p><table>${Object.entries(p.spec).map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</table>
+  <p><b>Ưu điểm:</b> ${esc(p.pros)}</p><p><b>Hạn chế:</b> ${esc(p.cons)}</p><p class="price">${vnd(p.price)} <small class="mut">(giá minh họa)</small></p>
+  <button class="btn s" data-a="${p.id}">Thêm vào giỏ</button><button class="btn s g" onclick="$('#dlg').close()">Đóng</button>`;$('#dlg').showModal()}
+document.addEventListener('click',e=>{const d=e.target.dataset||{};
+  if(d.c){cat=d.c;render()}
+  if(d.d)detail(d.d);
+  if(d.a){const i=cart.find(x=>x.id===d.a);i?i.n++:cart.push({id:d.a,n:1});store.set('cw_cart',cart);toast('Đã thêm vào giỏ');if($('#cart').classList.contains('open'))renderCart()}
+  if(d.p){cart.find(x=>x.id===d.p).n++;renderCart()}
+  if(d.m){const i=cart.find(x=>x.id===d.m);if(--i.n<1)cart=cart.filter(x=>x!==i);renderCart()}
+  if(d.r){cart=cart.filter(x=>x.id!==d.r);renderCart()}
+  if('x' in d)$('#cart').classList.remove('open');
+  if('cp' in d){coupon=$('#cp').value.trim().toUpperCase()==='CHIP10'?.1:0;toast(coupon?'Đã áp dụng giảm 10%':'Mã không hợp lệ');renderCart()}
+  if(e.target.closest('[data-cart]'))openCart()});
+document.addEventListener('submit',e=>{if(e.target.id==='co'){e.preventDefault();cart=[];coupon=0;store.set('cw_cart',cart);renderCart();toast('Đặt hàng thành công (demo)')}});
+['#q','#maxp','#sort'].forEach(s=>$(s).addEventListener('input',render));
+$('#aGo').onclick=()=>{const u=$('#aPurpose').value,b=+$('#aBudget').value;
+  const l=P.filter(p=>p.use.includes(u)&&p.price<=b&&p.stock).sort((a,b)=>b.rate-a.rate);
+  $('#aOut').innerHTML=l.map(p=>card(p).replace('</article>',`<p class="mut">Phù hợp vì: ${esc(p.pros)}</p></article>`)).join('')||'<p class="mut" style="text-align:center">Chưa có chip phù hợp ngân sách này trong dữ liệu mẫu.</p>'};
+const sp=new URLSearchParams(location.search);if(sp.get('q'))$('#q').value=sp.get('q');
+render();renderCart();$('#aGo').click();
+setTimeout(()=>{const s=sp.get('s');if(s==='cart')openCart();else if(s&&$('#'+s))jump(s)},200);
+
+</script>
+<script>
+/* Header */
+
+/* Cấu hình: đặt địa chỉ trang chứa container.html. Để trống = cùng thư mục (mở file trực tiếp). */
+
+const go=(sec,q)=>{if(sec==='cart'){openCart();return}if(q!==undefined){$('#q').value=q;render()}jump(sec)};
+document.querySelectorAll('[data-go]').forEach(a=>a.onclick=e=>{e.preventDefault();go(a.dataset.go)});
+document.getElementById('sf').onsubmit=e=>{e.preventDefault();go('store',document.getElementById('hq').value.trim())};
+function badge(){let n=0;try{n=(JSON.parse(localStorage.getItem('cw_cart'))||[]).reduce((s,i)=>s+i.n,0)}catch{}
+  document.getElementById('badge').textContent=n}
+badge();setInterval(badge,1000);addEventListener('storage',badge);
+
+</script>
+<script>
+/* Footer */
+
+document.getElementById('f').onsubmit=e=>{e.preventDefault();
+  const v=document.getElementById('em').value.trim(),m=document.getElementById('msg');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)){m.textContent='Email không hợp lệ.';return}
+  m.textContent='Cảm ơn bạn! Đã đăng ký: '+v;e.target.reset()};
+
+</script>
+</body></html>
